@@ -1,15 +1,62 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import java.io.*;
+import java.util.Scanner;
+import java.util.InputMismatchException;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+public class Main {
+    private static final String ARCHIVO = "usuarios.txt";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            System.out.println("Nombre: ");
+            String nombre = sc.nextLine();
+
+            System.out.println("Edad: ");
+            int edad = sc.nextInt();
+
+            System.out.println("Salario: ");
+            double salario = sc.nextDouble();
+
+            if (nombre.isEmpty() || edad < 0 || salario < 0) {
+                System.out.println("Datos inválidos!!!");
+                return;
+            }
+
+            Usuario usuario = new Usuario(nombre, edad, salario);
+
+            guardarUsuario(usuario);
+
+            System.out.println("\n Datos guardados: ");
+            leerUsuarios();
+        } catch (InputMismatchException e) {
+            System.out.println("Error: debes introducir números válidos");
+        } catch (IOException e) {
+            System.out.println("Error al manejar el archivo: " + e.getMessage());
+        } finally {
+            sc.close();
+        }
+    }
+
+    public static void guardarUsuario(Usuario usuario) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO, true));
+        bw.write(usuario.toFileString());
+        bw.newLine();
+        bw.close();
+    }
+
+    public static void leerUsuarios() {
+        try (BufferedReader br = new BufferedReader(new FileReader(ARCHIVO))) {
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                Usuario u = Usuario.fromString(linea);
+                System.out.println(u);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("archivo no encontrado");
+        }catch (IOException e){
+            System.out.println("Error al leer el archivo");
         }
     }
 }
